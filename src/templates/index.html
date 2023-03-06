@@ -1,9 +1,25 @@
-<title>mobile classifier App</title>
-
-<h1>
-    ファイルをアップロードしてガラケーかスマホかを判定しよう
-</h1>
-<form method = post enctype = multipart/form-data>
-<p><input type = file name = filename>
-<input type = submit value = 判定>
-</form>
+{% extends 'base.html' %} {% block content %}
+<div class="text-center">
+  <h1>
+    画像ファイルをアップロードして<br />
+    ガラケーかスマホかを判定しよう
+  </h1>
+  <div id="up">
+    <form method="POST" enctype="multipart/form-data">
+      <input type="file" name="filename" />
+      <input type="submit" value="判定" />
+    </form>
+  </div>
+  <div class="text-warning bg-dark">
+    <h5>
+      <p>※注意点</p>
+      <p>
+        画像に判定するものが複数写っていると判定がうまくいかなくなる場合があります
+      </p>
+      <p>
+        必ず画像ファイル(png, jpg, gif, jpeg形式のみ)をアップロードしてください
+      </p>
+    </h5>
+  </div>
+</div>
+{% endblock %}

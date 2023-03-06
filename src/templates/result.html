@@ -1,10 +1,14 @@
-<title>mobile classifier App</title>
-{% if mobileClass %}
-<h1>これは {{ mobileClass }} です</h1>
-<div>
-  <img src="{{ image }}" />
+{% extends 'base.html' %} {% block content %}
+<div class="text-center">
+  {% if Class %}
+  <h1>これは {{ Class }} です</h1>
+  <div>
+    <img src="data:image/png;base64,{{ data }}" />
+  </div>
+  <h5 class="m-3"><a href="./">トップへ戻る</a></h5>
+  {% else %}
+  <h5 class="m-3"><a href="./">トップへ戻る</a></h5>
+  {% endif %}
 </div>
-<a href="./">トップへ戻る</a>
-{% else %}
-<a href="./">トップへ戻る</a>
-{% endif %}
+
+{% endblock %}

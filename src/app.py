@@ -5,6 +5,8 @@ import io
 from PIL import Image
 import base64
 
+app = Flask(__name__)
+
 # 学習済みモデルを元に推論する
 def predict(img):
     net = Net().cpu().eval()
@@ -16,14 +18,13 @@ def predict(img):
     y = torch.argmax(net(img), dim=1).cpu().detach().numpy()
     return y
 
-# 推論したラベルから犬か猫かを返す関数
+# 推論したラベルから判定結果を返す関数
 def getName(label):
     if label == 0:
         return 'ガラケー'
     elif label == 1:
         return 'スマホ'
     
-app = Flask(__name__)
 
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif', 'jpeg'])
@@ -31,6 +32,16 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif', 'jpeg'])
 # 拡張子が適切かどうかをチェック
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# 画像をbase64形式に変換
+def img_to_base64_img(img):
+    buf = io.BytesIO()
+    img.save(buf, format="png")
+    buf.seek(0)
+    base64_img = base64.b64encode(buf.read()).decode()
+
+    return base64_img
+
 
 # URLにアクセスがあった場合の挙動の設定
 @app.route('/', methods = ['GET', 'POST'])
@@ -44,20 +55,12 @@ def predicts():
         # ファイルのチェック
         if file and allowed_file(file.filename):
             # 画像ファイルに対する処理
-            # 画像書き込み用バッファを確保
-            buf = io.BytesIO()
             image = Image.open(file).convert('RGB')
-            # 画像データをバッファに読み込む
-            image.save(buf, 'png')
-            # バイナリーデータをbase64でエンコードしてutf-8でデコード
-            base64_str = base64.b64encode(buf.getvalue()).decode('utf-8')
-            # HTML側のの記述に合わせるために付帯情報を付与
-            base64_data = f'data:image/png;base64,{base64_str}'
-
+            base64_data = img_to_base64_img(image)
             # 入力された画像に対して推論
             pred = predict(image)
-            mobileClass_ = getName(pred)
-            return render_template('result.html', mobileClass=mobileClass_, image=base64_data)
+            Class_ = getName(pred)
+            return render_template('result.html', Class=Class_, data=base64_data)
         return redirect(request.url)
 
     elif request.method == 'GET':
@@ -65,3 +68,4 @@ def predicts():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
